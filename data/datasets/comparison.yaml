@@ -1,0 +1,174 @@
+name: comparison
+statements:
+- id: S00001
+  statement: Sam works as a software engineer at TechCorp.
+  timestamp: '2024-01-08T09:00:00'
+  comment: orig m01
+- id: S00002
+  statement: TechCorp is a fintech company headquartered in San Francisco.
+  timestamp: '2024-01-08T09:05:00'
+  comment: orig m02
+- id: S00003
+  statement: Sam's manager at TechCorp is Jennifer.
+  timestamp: '2024-01-09T10:00:00'
+  comment: orig m03
+- id: S00004
+  statement: Sam lives in Oakland, California.
+  timestamp: '2024-01-10T08:30:00'
+  comment: orig m04
+- id: S00005
+  statement: Sam's partner is Alex. Alex works as a graphic designer.
+  timestamp: '2024-01-12T19:00:00'
+  comment: orig m05
+- id: S00006
+  statement: Sam started learning Spanish two months ago, mainly for an upcoming trip
+    to Mexico.
+  timestamp: '2024-01-15T07:00:00'
+  comment: orig m06
+- id: S00007
+  statement: Sam uses Duolingo daily for Spanish practice.
+  timestamp: '2024-01-15T07:05:00'
+  comment: orig m07
+- id: S00008
+  statement: Sam goes rock climbing at Berkeley Ironworks gym.
+  timestamp: '2024-01-17T18:30:00'
+  comment: orig m08
+- id: S00009
+  statement: Sam has been rock climbing for three years.
+  timestamp: '2024-01-17T18:35:00'
+  comment: orig m09
+- id: S00010
+  statement: Sam's favorite climbing problems are V4-V5 boulder routes.
+  timestamp: '2024-01-18T19:00:00'
+  comment: orig m10
+- id: S00011
+  statement: Sam's mother Maria lives in Boston.
+  timestamp: '2024-01-22T20:00:00'
+  comment: orig m11
+- id: S00012
+  statement: Maria works as a high school chemistry teacher.
+  timestamp: '2024-01-22T20:05:00'
+  comment: orig m12
+- id: S00013
+  statement: Sam's brother David lives in Seattle.
+  timestamp: '2024-01-23T19:30:00'
+  comment: orig m13
+- id: S00014
+  statement: David works at Amazon as a product manager. His office is at Amazon's
+    Seattle headquarters.
+  timestamp: '2024-01-23T19:35:00'
+  comment: orig m14
+- id: S00015
+  statement: Sam plans to visit Maria for her birthday in mid-May.
+  timestamp: '2024-01-25T21:00:00'
+  comment: orig m15
+- id: S00016
+  statement: 'Sam started a side project: building a web scraper to find new climbing
+    destinations.'
+  timestamp: '2024-01-29T22:00:00'
+  comment: orig m16
+- id: S00017
+  statement: Sam decided to use Python for the web scraper project.
+  timestamp: '2024-01-29T22:05:00'
+  comment: orig m17
+- id: S00018
+  statement: Sam uses the BeautifulSoup library for parsing HTML in the scraper.
+  timestamp: '2024-01-30T22:30:00'
+  comment: orig m18
+- id: S00019
+  statement: The scraper collects climbing route data from MountainProject.com.
+  timestamp: '2024-01-31T23:00:00'
+  comment: orig m19
+- id: S00020
+  statement: Sam's goal with the scraper is to discover new outdoor climbing destinations
+    not on popular guidebooks.
+  timestamp: '2024-02-01T22:45:00'
+  comment: orig m20
+- id: S00021
+  statement: Sam had an amazing climbing trip to Yosemite last weekend.
+  timestamp: '2024-02-05T10:00:00'
+  comment: orig m21
+- id: S00022
+  statement: Sam climbed with Alex at Yosemite. Alex is also a climber but at an easier
+    grade.
+  timestamp: '2024-02-05T10:05:00'
+  comment: orig m22
+- id: S00023
+  statement: Sam is feeling burned out at TechCorp due to long hours and frequent
+    late-night production incidents.
+  timestamp: '2024-02-08T20:00:00'
+  comment: orig m23
+- id: S00024
+  statement: Sam started interviewing at other companies, mostly developer-tools startups.
+  timestamp: '2024-02-10T18:00:00'
+  comment: orig m24
+- id: S00025
+  statement: Sam got a job offer from StartupCo, a developer-tools startup.
+  timestamp: '2024-02-14T17:00:00'
+  comment: orig m25
+- id: S00026
+  statement: StartupCo is based in San Francisco but offers fully remote work.
+  timestamp: '2024-02-14T17:05:00'
+  comment: orig m26
+- id: S00027
+  statement: Sam accepted the StartupCo offer and gave notice at TechCorp.
+  timestamp: '2024-02-15T19:00:00'
+  comment: orig m27
+- id: S00028
+  statement: Sam's new manager at StartupCo will be Marcus.
+  timestamp: '2024-02-16T20:00:00'
+  comment: orig m28
+- id: S00029
+  statement: Sam started at StartupCo today. The role is senior backend engineer.
+  timestamp: '2024-02-19T09:00:00'
+  comment: orig m29
+- id: S00030
+  statement: Sam is now learning Rust because StartupCo's main service is written
+    in it.
+  timestamp: '2024-02-20T19:00:00'
+  comment: orig m30
+- id: S00031
+  statement: Sam decided to rewrite the climbing scraper in Rust as a learning exercise.
+  timestamp: '2024-02-22T22:00:00'
+  comment: orig m31
+- id: S00032
+  statement: Sam is using the reqwest and scraper crates for the Rust version of the
+    scraper.
+  timestamp: '2024-02-22T22:05:00'
+  comment: orig m32
+- id: S00033
+  statement: Maria's birthday is May 15.
+  timestamp: '2024-02-26T20:00:00'
+  comment: orig m33
+- id: S00034
+  statement: Sam booked flights to Boston for May 13 through 17 to be there for Maria's
+    birthday.
+  timestamp: '2024-02-27T21:00:00'
+  comment: orig m34
+- id: S00035
+  statement: Alex will join Sam on the Boston trip.
+  timestamp: '2024-02-27T21:05:00'
+  comment: orig m35
+- id: S00036
+  statement: David will also fly to Boston for Maria's birthday.
+  timestamp: '2024-02-28T22:00:00'
+  comment: orig m36
+- id: S00037
+  statement: Sam's Spanish practice has slipped to once a week since starting at StartupCo.
+  timestamp: '2024-03-01T19:00:00'
+  comment: orig m37
+- id: S00038
+  statement: Sam went climbing at Berkeley Ironworks this morning, first session in
+    two weeks.
+  timestamp: '2024-03-02T11:00:00'
+  comment: orig m38
+- id: S00039
+  statement: "Sam ordered a new pair of climbing shoes \u2014 the La Sportiva Solution.\
+    \ They should arrive by mid-March."
+  timestamp: '2024-03-03T15:00:00'
+  comment: orig m39
+- id: S00040
+  statement: Sam is planning a long climbing trip to Joshua Tree in late March with
+    Alex.
+  timestamp: '2024-03-04T20:00:00'
+  comment: orig m40
