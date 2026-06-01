@@ -1,0 +1,167 @@
+name: comparison
+dataset: comparison
+tests:
+- id: Q00001
+  query: Where does Sam live?
+  required_retrieval:
+  - S00004
+  expected_answer: Oakland, California
+  comment: orig q01 (single_hop)
+- id: Q00002
+  query: What is Maria's profession?
+  required_retrieval:
+  - S00012
+  expected_answer: high school chemistry teacher
+  comment: orig q02 (single_hop)
+- id: Q00003
+  query: When is Maria's birthday?
+  required_retrieval:
+  - S00033
+  expected_answer: May 15
+  comment: orig q03 (single_hop)
+- id: Q00004
+  query: What climbing shoes did Sam order?
+  required_retrieval:
+  - S00039
+  expected_answer: La Sportiva Solution
+  comment: orig q04 (single_hop)
+- id: Q00005
+  query: In which city is the company that David works for headquartered?
+  required_retrieval:
+  - S00014
+  expected_answer: Seattle
+  comment: orig q05 (two_hop)
+- id: Q00006
+  query: What programming language does Sam's web scraper use?
+  required_retrieval:
+  - S00017
+  - S00031
+  expected_answer: Python (initially), then rewritten in Rust
+  comment: orig q06 (two_hop)
+- id: Q00007
+  query: What does Sam's mother do for a living, and where does she live?
+  required_retrieval:
+  - S00011
+  - S00012
+  expected_answer: high school chemistry teacher in Boston
+  comment: orig q07 (two_hop)
+- id: Q00008
+  query: Who is the manager of the person whose brother works at Amazon?
+  required_retrieval:
+  - S00013
+  - S00014
+  - S00028
+  - S00029
+  expected_answer: Marcus
+  comment: orig q08 (deep_multi_hop)
+- id: Q00009
+  query: What is the profession of the partner of the engineer who has a brother in
+    Seattle?
+  required_retrieval:
+  - S00005
+  - S00013
+  expected_answer: graphic designer
+  comment: orig q09 (deep_multi_hop)
+- id: Q00010
+  query: In which city was the person born who is married to the graphic designer's
+    partner's brother?
+  required_retrieval: []
+  expected_answer: unknown / cannot determine (Maria's birth location is not in the
+    facts)
+  comment: orig q10 (deep_multi_hop)
+- id: Q00011
+  query: What outdoor activities does Sam enjoy?
+  required_retrieval:
+  - S00008
+  - S00021
+  - S00040
+  - S00038
+  expected_answer: "rock climbing (Yosemite, Joshua Tree, Berkeley Ironworks \u2014\
+    \ though gym is indoor)"
+  comment: orig q11 (implicit_conceptual)
+- id: Q00012
+  query: What Python libraries has Sam used?
+  required_retrieval:
+  - S00017
+  - S00018
+  expected_answer: BeautifulSoup
+  comment: orig q12 (implicit_conceptual)
+- id: Q00013
+  query: What hobbies has Sam been less active in lately?
+  required_retrieval:
+  - S00037
+  - S00038
+  expected_answer: Spanish learning (slipped to once a week) and climbing (first session
+    in two weeks before m38)
+  comment: orig q13 (implicit_conceptual)
+- id: Q00014
+  query: Where does Sam currently work?
+  required_retrieval:
+  - S00027
+  - S00029
+  expected_answer: StartupCo
+  comment: orig q14 (information_update)
+- id: Q00015
+  query: Who is Sam's current manager?
+  required_retrieval:
+  - S00028
+  - S00029
+  expected_answer: Marcus
+  comment: orig q15 (information_update)
+- id: Q00016
+  query: What language is Sam's climbing scraper currently written in?
+  required_retrieval:
+  - S00017
+  - S00031
+  expected_answer: Rust
+  comment: orig q16 (information_update)
+- id: Q00017
+  query: Who are all the people Sam has mentioned in conversations?
+  required_retrieval:
+  - S00003
+  - S00005
+  - S00011
+  - S00013
+  - S00028
+  expected_answer: Alex (partner), Jennifer (old manager), Maria (mother), David (brother),
+    Marcus (new manager)
+  comment: orig q17 (compositional_aggregation)
+- id: Q00018
+  query: What different programming languages and libraries has Sam used or learned?
+  required_retrieval:
+  - S00017
+  - S00018
+  - S00030
+  - S00032
+  expected_answer: Python, BeautifulSoup, Rust, reqwest, scraper
+  comment: orig q18 (compositional_aggregation)
+- id: Q00019
+  query: What places does Sam have travel or residence connections to?
+  required_retrieval:
+  - S00002
+  - S00004
+  - S00006
+  - S00011
+  - S00013
+  - S00021
+  - S00034
+  - S00040
+  expected_answer: Oakland (lives), San Francisco (work), Boston (mother + planned
+    trip), Seattle (brother), Yosemite (climbed), Joshua Tree (planned trip), Mexico
+    (Spanish learning motivation)
+  comment: orig q19 (compositional_aggregation)
+- id: Q00020
+  query: What is Sam's favorite food?
+  required_retrieval: []
+  expected_answer: unknown / not mentioned
+  comment: orig q20 (absence_abstention)
+- id: Q00021
+  query: Does Sam have any pets?
+  required_retrieval: []
+  expected_answer: unknown / not mentioned
+  comment: orig q21 (absence_abstention)
+- id: Q00022
+  query: What is Sam's salary at StartupCo?
+  required_retrieval: []
+  expected_answer: unknown / not mentioned
+  comment: orig q22 (absence_abstention)

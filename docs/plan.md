@@ -268,9 +268,10 @@ Recipes pass through extra args, e.g.
 - **M3**: visualization polish (interactive graphs, PPR trail), LLM-judge
   answer scoring, param sweeps.
 
-## 10. Open questions for review
+## 10. Resolved decisions (review complete)
 
-1. Console-script name — `lmb` ok, or prefer `llm-memory-bench`?
-2. Keep ChromaDB as A-Mem's internal vector store (as in the reference), or
-   abstract a shared vector-store layer now? I lean: keep it internal for M1.
-3. Backoff cap of 30s acceptable, or do you want the reference's flat 5s?
+1. Console-script name: **`lmb`**.
+2. Vector store: **keep ChromaDB internal to A-Mem for M1**; a shared
+   vector-store layer is deferred.
+3. 429 backoff: **capped exponential** (1s → ×2 → 30s cap), retrying
+   indefinitely.

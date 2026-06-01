@@ -1,0 +1,6 @@
+system: amem
+name: default
+params:
+  embedding_model: all-MiniLM-L6-v2
+  retrieval_k: 5
+  evo_threshold: 100
