@@ -1023,6 +1023,7 @@ dependencies = [
     { name = "numpy" },
     { name = "openai" },
     { name = "pyyaml" },
+    { name = "scipy" },
     { name = "sentence-transformers" },
 ]
 
@@ -1040,6 +1041,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
+    { name = "scipy", specifier = ">=1.11" },
     { name = "sentence-transformers", specifier = ">=3.0" },
 ]
 provides-extras = ["dev"]
