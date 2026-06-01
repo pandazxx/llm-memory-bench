@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from ..core.models import QueryResult
-from .common import esc, page
+from .common import esc, page, scored_result_table
 from .graph import TRACE_OPTIONS, graph_assets, graph_block
 
 _ENTITY_COLOR = "#60a5fa"
@@ -167,22 +167,6 @@ def render_memory(state: dict[str, Any], out_dir: Path) -> None:
         + _triple_table(items)
     )
     (out_dir / "index.html").write_text(page(f"Memory — {label}", body, head=graph_assets()))
-
-
-def _result_table(results: list[QueryResult]) -> str:
-    rows = []
-    for r in results:
-        rows.append(
-            "<tr>"
-            f"<td><code>{esc(r.query_id)}</code></td>"
-            f"<td>{esc(r.answer)}</td>"
-            f"<td>{', '.join(f'<code>{esc(i)}</code>' for i in r.retrieved_ids) or '—'}</td>"
-            "</tr>"
-        )
-    return (
-        "<table><thead><tr><th>Query id</th><th>Answer</th><th>Retrieved</th>"
-        "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
-    )
 
 
 def _trail_graph(r: QueryResult, items_by_id: dict[str, dict]) -> str:
@@ -340,14 +324,19 @@ def _trail(r: QueryResult, items_by_id: dict[str, dict]) -> str:
     return "".join(parts)
 
 
-def render_retrieval(state: dict[str, Any], results: list[QueryResult], out_dir: Path) -> None:
+def render_retrieval(
+    state: dict[str, Any],
+    results: list[QueryResult],
+    out_dir: Path,
+    scores: list[dict[str, Any]] | None = None,
+) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     label = state.get("label", state.get("system", "System"))
     items_by_id = {it.get("id"): it for it in state.get("items", [])}
     body = (
         f"<h1>Query results — {esc(label)}</h1>"
         "<h2>Results</h2>"
-        + _result_table(results)
+        + scored_result_table(results, scores)
         + "<h2>Retrieval trails</h2>"
         + "".join(_trail(r, items_by_id) for r in results)
     )

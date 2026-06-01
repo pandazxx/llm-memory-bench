@@ -56,7 +56,7 @@ def run(exp: Experiment, results_root: Path | str = "results") -> Path:
         results.append(result)
         scores.append(scoring.score_query(q, result))
 
-    system.render_retrieval(results, paths.result_dir)
+    system.render_retrieval(results, paths.result_dir, scores=[s.to_dict() for s in scores])
     agg = scoring.aggregate(scores)
 
     payload = {
@@ -97,7 +97,9 @@ def rerender(dataset: str, testset: str, results_root: Path | str = "results") -
 
         system_cls.render_from_state(memory_dir, memory_dir)
         results = [QueryResult.from_dict(d) for d in data.get("results", [])]
-        system_cls.render_retrieval_from_state(memory_dir, results, result_dir)
+        system_cls.render_retrieval_from_state(
+            memory_dir, results, result_dir, scores=data.get("scores", [])
+        )
         n += 1
         log.info("re-rendered %s", run_dir.name)
 
@@ -113,10 +115,12 @@ def _write_comparison_index(experiment_dir: Path) -> None:
         data = json.loads(result_json.read_text())
         agg = data.get("aggregate", {})
         run_name = result_json.parent.parent.name
+        label = data.get("system_label", run_name)
         rows.append(
             "<tr>"
-            f"<td><a href='{esc(run_name)}/result/index.html'>{esc(run_name)}</a></td>"
-            f"<td><a href='{esc(run_name)}/memory/index.html'>memory</a></td>"
+            f"<td>{esc(label)}</td>"
+            f"<td><a href='{esc(run_name)}/result/index.html'>results</a> · "
+            f"<a href='{esc(run_name)}/memory/index.html'>memory</a></td>"
             f"<td>{agg.get('macro_precision', 0):.3f}</td>"
             f"<td>{agg.get('macro_recall', 0):.3f}</td>"
             f"<td>{agg.get('macro_f1', 0):.3f}</td>"
@@ -126,8 +130,9 @@ def _write_comparison_index(experiment_dir: Path) -> None:
         )
     body = (
         f"<h1>Comparison — {esc(experiment_dir.name)}</h1>"
+        f"<p class='muted'>{len(rows)} system(s) · macro-averaged over all queries</p>"
         "<table><thead><tr>"
-        "<th>System_paramset</th><th>Memory</th><th>Precision</th><th>Recall</th>"
+        "<th>System</th><th>Pages</th><th>Precision</th><th>Recall</th>"
         "<th>F1</th><th>Answer acc</th><th>N</th>"
         "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
     )

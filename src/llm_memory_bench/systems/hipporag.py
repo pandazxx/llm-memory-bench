@@ -214,8 +214,10 @@ class HippoRAG(System):
     def render_memory(self, out_dir: Path) -> None:
         kg_viz.render_memory(self._state(), out_dir)
 
-    def render_retrieval(self, results: list[QueryResult], out_dir: Path) -> None:
-        kg_viz.render_retrieval(self._state(), results, out_dir)
+    def render_retrieval(
+        self, results: list[QueryResult], out_dir: Path, scores: list[dict] | None = None
+    ) -> None:
+        kg_viz.render_retrieval(self._state(), results, out_dir, scores)
 
     @classmethod
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
@@ -224,7 +226,11 @@ class HippoRAG(System):
 
     @classmethod
     def render_retrieval_from_state(
-        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+        cls,
+        state_dir: Path,
+        results: list[QueryResult],
+        out_dir: Path,
+        scores: list[dict] | None = None,
     ) -> None:
         state = json.loads((state_dir / "state.json").read_text())
-        kg_viz.render_retrieval(state, results, out_dir)
+        kg_viz.render_retrieval(state, results, out_dir, scores)

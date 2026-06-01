@@ -8,3 +8,7 @@ results/
 .chroma/
 .env
 .direnv/
+
+# macOS
+.DS_Store
+**/.DS_Store

@@ -6,30 +6,12 @@ from pathlib import Path
 from typing import Any
 
 from ..core.models import QueryResult
-from .common import esc, page
+from .common import esc, page, scored_result_table
 from .graph import TRACE_OPTIONS, graph_assets, graph_block
 
 _QUERY_COLOR = "#ef4444"
 _SEED_COLOR = "#60a5fa"
 _LINK_COLOR = "#a78bfa"
-
-
-def _result_table(results: list[QueryResult]) -> str:
-    rows = []
-    for r in results:
-        rows.append(
-            "<tr>"
-            f"<td><code>{esc(r.query_id)}</code></td>"
-            f"<td>{esc(r.answer)}</td>"
-            f"<td>{', '.join(f'<code>{esc(i)}</code>' for i in r.retrieved_ids) or '—'}</td>"
-            f"<td>{', '.join(f'<code>{esc(i)}</code>' for i in r.trail.get('seed_ids', [])) or '—'}</td>"
-            "</tr>"
-        )
-    return (
-        "<table><thead><tr>"
-        "<th>Query id</th><th>Answer</th><th>Retrieved</th><th>Seeds</th>"
-        "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
-    )
 
 
 def _content_of(state: dict[str, Any], mid: str) -> str:
@@ -102,13 +84,18 @@ def _trail(state: dict[str, Any], r: QueryResult) -> str:
     )
 
 
-def render(state: dict[str, Any], results: list[QueryResult], out_dir: Path) -> None:
+def render(
+    state: dict[str, Any],
+    results: list[QueryResult],
+    out_dir: Path,
+    scores: list[dict[str, Any]] | None = None,
+) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     label = state.get("label", state.get("system", "System"))
     body = (
         f"<h1>Query results — {esc(label)}</h1>"
         "<h2>Results</h2>"
-        + _result_table(results)
+        + scored_result_table(results, scores)
         + "<h2>Retrieval trails</h2>"
         + "".join(_trail(state, r) for r in results)
     )

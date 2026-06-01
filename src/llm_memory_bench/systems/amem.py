@@ -443,8 +443,10 @@ class AMem(System):
     def render_memory(self, out_dir: Path) -> None:
         memory_viz.render(self._state(), out_dir)
 
-    def render_retrieval(self, results: list[QueryResult], out_dir: Path) -> None:
-        retrieval_viz.render(self._state(), results, out_dir)
+    def render_retrieval(
+        self, results: list[QueryResult], out_dir: Path, scores: list[dict] | None = None
+    ) -> None:
+        retrieval_viz.render(self._state(), results, out_dir, scores)
 
     @classmethod
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
@@ -453,7 +455,11 @@ class AMem(System):
 
     @classmethod
     def render_retrieval_from_state(
-        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+        cls,
+        state_dir: Path,
+        results: list[QueryResult],
+        out_dir: Path,
+        scores: list[dict] | None = None,
     ) -> None:
         state = json.loads((state_dir / "state.json").read_text())
-        retrieval_viz.render(state, results, out_dir)
+        retrieval_viz.render(state, results, out_dir, scores)

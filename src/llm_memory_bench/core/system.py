@@ -39,8 +39,13 @@ class System(ABC):
         """Write the memory-structure visualization to ``out_dir`` (index.html + assets)."""
 
     @abstractmethod
-    def render_retrieval(self, results: list[QueryResult], out_dir: Path) -> None:
-        """Write the retrieval-trail visualization to ``out_dir``."""
+    def render_retrieval(
+        self, results: list[QueryResult], out_dir: Path, scores: list[dict] | None = None
+    ) -> None:
+        """Write the retrieval-trail visualization to ``out_dir``.
+
+        ``scores`` (per-query dicts from ``scoring.QueryScore``) drive the
+        expected-vs-actual + precision/recall/F1 comparison table when present."""
 
     @abstractmethod
     def dump_memory_state(self, out_dir: Path) -> None:
@@ -54,6 +59,10 @@ class System(ABC):
     @classmethod
     @abstractmethod
     def render_retrieval_from_state(
-        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+        cls,
+        state_dir: Path,
+        results: list[QueryResult],
+        out_dir: Path,
+        scores: list[dict] | None = None,
     ) -> None:
         """Re-emit the retrieval visualization from a frozen state.json + results. No LLM calls."""
