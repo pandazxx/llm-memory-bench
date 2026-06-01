@@ -114,7 +114,12 @@ class HippoRAG2(System):
                         graph[(i, j)] = max(graph[(i, j)], float(sims[i, j]))
                         graph[(j, i)] = max(graph[(j, i)], float(sims[i, j]))
                         edge_records.append(
-                            {"src": phrases[i], "dst": phrases[j], "kind": "synonymy"}
+                            {
+                                "src": phrases[i],
+                                "dst": phrases[j],
+                                "kind": "synonymy",
+                                "weight": round(float(sims[i, j]), 3),
+                            }
                         )
 
         # 4c. Context edges (phrase ↔ passage node).

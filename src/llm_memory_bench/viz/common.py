@@ -21,12 +21,8 @@ code {{ background: #f4f4f4; padding: 1px 4px; border-radius: 3px; }}
 .hit {{ color: #137333; font-weight: 600; }}
 .miss {{ color: #c5221f; font-weight: 600; }}
 .muted {{ color: #777; }}
-pre.mermaid {{ background: #fafafa; border: 1px solid #eee; padding: 1rem; }}
 </style>
-<script type="module">
-import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-mermaid.initialize({{ startOnLoad: true, securityLevel: "loose" }});
-</script>
+{head}
 </head>
 <body>
 {body}
@@ -46,10 +42,5 @@ def tags_html(tags: list) -> str:
     )
 
 
-def page(title: str, body: str) -> str:
-    return PAGE.format(title=esc(title), body=body)
-
-
-def mermaid_id(raw: str) -> str:
-    """Safe node id for mermaid."""
-    return "n_" + "".join(c if c.isalnum() else "_" for c in str(raw))
+def page(title: str, body: str, head: str = "") -> str:
+    return PAGE.format(title=esc(title), body=body, head=head)

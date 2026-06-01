@@ -94,7 +94,12 @@ class HippoRAG(System):
                     graph[(i, j)] = float(sims[i, j])
                     graph[(j, i)] = float(sims[i, j])
                     edge_records.append(
-                        {"src": entities[i], "dst": entities[j], "kind": "synonymy"}
+                        {
+                            "src": entities[i],
+                            "dst": entities[j],
+                            "kind": "synonymy",
+                            "weight": round(float(sims[i, j]), 3),
+                        }
                     )
 
         # 6. Sparse CSR adjacency.
