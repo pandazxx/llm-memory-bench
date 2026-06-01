@@ -23,6 +23,7 @@ HippoRAG, HippoRAG2) we will port onto a cleaner, more general framework.
 ```
 pyproject.toml            # uv project, deps, console-script entrypoint
 uv.lock
+justfile                  # task runner: sync / run / render / convert / fmt / test
 README.md
 docs/plan.md              # this file
 src/llm_memory_bench/
@@ -239,6 +240,22 @@ Milestone 1 keeps these minimal but functional; graph polish comes later.
 
 Reuse the reference's mermaid + lightweight interactive-HTML approach;
 `render_from_state` lets us iterate on visuals without re-calling the LLM.
+
+## 8a. Task runner (`justfile`)
+
+All common workflows go through `just` over `uv` (mirrors the reference repo):
+
+| Recipe | Action |
+| --- | --- |
+| `just sync` | `uv sync` — create `.venv`, install deps |
+| `just run` | run one experiment (defaults to amem/default/comparison/comparison) |
+| `just render` | re-emit memory + retrieval HTML from frozen state (no LLM calls) |
+| `just convert` | convert reference `dataset.json` → `data/` YAML dataset + test-set |
+| `just fmt` / `just lint` | ruff format + lint |
+| `just test` | pytest |
+
+Recipes pass through extra args, e.g.
+`just run -- --system amem --params default --dataset comparison --testset comparison`.
 
 ## 9. Milestones
 
