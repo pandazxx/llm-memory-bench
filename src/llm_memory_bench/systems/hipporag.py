@@ -221,3 +221,10 @@ class HippoRAG(System):
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
         state = json.loads((state_dir / "state.json").read_text())
         kg_viz.render_memory(state, out_dir)
+
+    @classmethod
+    def render_retrieval_from_state(
+        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+    ) -> None:
+        state = json.loads((state_dir / "state.json").read_text())
+        kg_viz.render_retrieval(state, results, out_dir)

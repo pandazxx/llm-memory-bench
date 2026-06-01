@@ -7,7 +7,7 @@ import logging
 import sys
 from pathlib import Path
 
-from .core.experiment import Experiment, run
+from .core.experiment import Experiment, rerender, run
 from .systems import get_system
 
 
@@ -27,6 +27,13 @@ def _cmd_render(args: argparse.Namespace) -> int:
     out_dir = Path(args.out or state_dir)
     system_cls.render_from_state(state_dir, out_dir)
     print(f"Rendered memory viz from {state_dir} -> {out_dir}")
+    return 0
+
+
+def _cmd_rerender(args: argparse.Namespace) -> int:
+    """Re-render every run's HTML for an experiment from frozen json (no LLM calls)."""
+    exp_dir = rerender(args.dataset, args.testset, results_root=args.results)
+    print(f"Re-rendered results under {exp_dir}")
     return 0
 
 
@@ -56,6 +63,12 @@ def main(argv: list[str] | None = None) -> int:
     p_render.add_argument("--state-dir", required=True)
     p_render.add_argument("--out", default=None)
     p_render.set_defaults(func=_cmd_render)
+
+    p_rr = sub.add_parser("rerender", help="re-render all viz for an experiment from frozen json")
+    p_rr.add_argument("--dataset", default="comparison")
+    p_rr.add_argument("--testset", default="comparison")
+    p_rr.add_argument("--results", default="results")
+    p_rr.set_defaults(func=_cmd_rerender)
 
     p_conv = sub.add_parser("convert", help="convert reference dataset.json to YAML")
     p_conv.add_argument("src", help="path to reference dataset.json")

@@ -18,6 +18,7 @@ from ..io.testset import find_testset, load_testset
 from ..systems import get_system
 from ..viz.common import esc, page
 from . import scoring
+from .models import QueryResult
 from .storage import ensure_dirs, run_paths
 
 log = logging.getLogger(__name__)
@@ -77,6 +78,32 @@ def run(exp: Experiment, results_root: Path | str = "results") -> Path:
         paths.run_dir,
     )
     return paths.run_dir
+
+
+def rerender(dataset: str, testset: str, results_root: Path | str = "results") -> Path:
+    """Re-emit every run's memory + retrieval HTML and the comparison index from
+    frozen state.json/result.json under ``results/<dataset>_<testset>/``. No LLM calls."""
+    experiment_dir = Path(results_root) / f"{dataset}_{testset}"
+    if not experiment_dir.is_dir():
+        raise FileNotFoundError(f"no results to re-render at {experiment_dir}")
+
+    n = 0
+    for result_json in sorted(experiment_dir.glob("*/result/result.json")):
+        run_dir = result_json.parent.parent
+        data = json.loads(result_json.read_text())
+        system_cls = get_system(data["experiment"]["system"])
+        memory_dir = run_dir / "memory"
+        result_dir = run_dir / "result"
+
+        system_cls.render_from_state(memory_dir, memory_dir)
+        results = [QueryResult.from_dict(d) for d in data.get("results", [])]
+        system_cls.render_retrieval_from_state(memory_dir, results, result_dir)
+        n += 1
+        log.info("re-rendered %s", run_dir.name)
+
+    _write_comparison_index(experiment_dir)
+    log.info("re-rendered %d run(s) -> %s", n, experiment_dir)
+    return experiment_dir
 
 
 def _write_comparison_index(experiment_dir: Path) -> None:

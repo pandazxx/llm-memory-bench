@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from llm_memory_bench.core import experiment as exp_mod
-from llm_memory_bench.core.experiment import Experiment, run
+from llm_memory_bench.core.experiment import Experiment, rerender, run
 from llm_memory_bench.core.models import Query, QueryResult, Statement
 from llm_memory_bench.core.system import System
 
@@ -37,7 +37,11 @@ class StubSystem(System):
 
     @classmethod
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
-        (out_dir / "index.html").write_text("<html>rerender</html>")
+        (out_dir / "index.html").write_text("<html>rerender-mem</html>")
+
+    @classmethod
+    def render_retrieval_from_state(cls, state_dir: Path, results, out_dir: Path) -> None:
+        (out_dir / "index.html").write_text(f"<html>rerender-res {len(results)}</html>")
 
 
 def test_run_end_to_end(tmp_path, monkeypatch):
@@ -66,4 +70,12 @@ def test_run_end_to_end(tmp_path, monkeypatch):
     assert result_json["aggregate"]["answer_accuracy"] == 1.0
     assert (run_dir / "memory" / "index.html").exists()
     assert (run_dir / "result" / "index.html").exists()
+    assert (results_root / "ds_ts" / "index.html").exists()
+
+    # Re-render from frozen json only (no LLM, no system construction).
+    (run_dir / "result" / "index.html").write_text("STALE")
+    (run_dir / "memory" / "index.html").write_text("STALE")
+    rerender("ds", "ts", results_root=results_root)
+    assert "rerender-res" in (run_dir / "result" / "index.html").read_text()
+    assert "rerender-mem" in (run_dir / "memory" / "index.html").read_text()
     assert (results_root / "ds_ts" / "index.html").exists()

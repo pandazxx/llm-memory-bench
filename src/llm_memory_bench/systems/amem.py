@@ -450,3 +450,10 @@ class AMem(System):
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
         state = json.loads((state_dir / "state.json").read_text())
         memory_viz.render(state, out_dir)
+
+    @classmethod
+    def render_retrieval_from_state(
+        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+    ) -> None:
+        state = json.loads((state_dir / "state.json").read_text())
+        retrieval_viz.render(state, results, out_dir)

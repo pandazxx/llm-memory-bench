@@ -50,3 +50,10 @@ class System(ABC):
     @abstractmethod
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
         """Re-emit the memory visualization from a frozen state.json. No LLM calls."""
+
+    @classmethod
+    @abstractmethod
+    def render_retrieval_from_state(
+        cls, state_dir: Path, results: list[QueryResult], out_dir: Path
+    ) -> None:
+        """Re-emit the retrieval visualization from a frozen state.json + results. No LLM calls."""
