@@ -6,3 +6,5 @@ results/
 .ruff_cache/
 *.egg-info/
 .chroma/
+.env
+.direnv/
