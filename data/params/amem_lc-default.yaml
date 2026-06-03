@@ -1,0 +1,7 @@
+system: amem_lc
+name: default
+params:
+  embedding_model: all-MiniLM-L6-v2
+  retrieval_k: 5
+  evo_threshold: 100
+  late_chunk_max_tokens: 512

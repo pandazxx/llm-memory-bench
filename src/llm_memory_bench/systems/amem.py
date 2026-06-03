@@ -184,19 +184,13 @@ class _Engine:
             log.error("analyze_content failed: %s", e)
             return {"keywords": [], "context": "General", "tags": []}
 
-    def _find_related(self, content: str, k: int) -> tuple[str, list[str]]:
-        count = self.collection.count()
-        if count == 0:
-            return "", []
-        results = self.collection.query(query_texts=[content], n_results=min(k, count))
-        if not results or not results.get("ids") or not results["ids"][0]:
-            return "", []
-        parts, ids = [], []
-        for i, doc_id in enumerate(results["ids"][0]):
+    def _neighbor_block(self, ids: list[str]) -> str:
+        """Format neighbour notes into the text block the evolution prompt expects."""
+        parts = []
+        for i, doc_id in enumerate(ids):
             note = self.memories.get(doc_id)
             if not note:
                 continue
-            ids.append(doc_id)
             parts.append(
                 f"Memory {i + 1} (ID: {doc_id}):\n"
                 f"  content: {note.content}\n"
@@ -204,28 +198,20 @@ class _Engine:
                 f"  tags: {note.tags}\n"
                 f"  context: {note.context}"
             )
-        return "\n\n".join(parts), ids
+        return "\n\n".join(parts)
 
-    def process_memory(self, note: MemoryNote, k: int) -> bool:
-        if not self.memories:
-            return False
-        neighbors_text, neighbor_ids = self._find_related(note.content, k)
-        if not neighbors_text or not neighbor_ids:
-            return False
-        prompt = PROMPT_EVOLUTION.format(
-            content=note.content,
-            context=note.context,
-            keywords=note.keywords,
-            nearest_neighbors_memories=neighbors_text,
-            neighbor_number=len(neighbor_ids),
-        )
-        try:
-            resp = nim.chat(prompt)
-        except Exception as e:
-            log.error("process_memory LLM call failed: %s", e)
-            return False
-        if not resp.get("should_evolve", False):
-            return False
+    def _find_related(self, content: str, k: int) -> tuple[str, list[str]]:
+        count = self.collection.count()
+        if count == 0:
+            return "", []
+        results = self.collection.query(query_texts=[content], n_results=min(k, count))
+        if not results or not results.get("ids") or not results["ids"][0]:
+            return "", []
+        ids = [doc_id for doc_id in results["ids"][0] if doc_id in self.memories]
+        return self._neighbor_block(ids), ids
+
+    def _apply_evolution(self, note: MemoryNote, resp: dict, neighbor_ids: list[str]) -> None:
+        """Apply the LLM's evolution decision: strengthen links / rewrite neighbours."""
         for action in resp.get("actions", []):
             if action == "strengthen":
                 note.links.extend(resp.get("suggested_connections", []))
@@ -261,6 +247,28 @@ class _Engine:
                                 "new": new_tags_all[i],
                             }
                         )
+
+    def process_memory(self, note: MemoryNote, k: int) -> bool:
+        if not self.memories:
+            return False
+        neighbors_text, neighbor_ids = self._find_related(note.content, k)
+        if not neighbors_text or not neighbor_ids:
+            return False
+        prompt = PROMPT_EVOLUTION.format(
+            content=note.content,
+            context=note.context,
+            keywords=note.keywords,
+            nearest_neighbors_memories=neighbors_text,
+            neighbor_number=len(neighbor_ids),
+        )
+        try:
+            resp = nim.chat(prompt)
+        except Exception as e:
+            log.error("process_memory LLM call failed: %s", e)
+            return False
+        if not resp.get("should_evolve", False):
+            return False
+        self._apply_evolution(note, resp, neighbor_ids)
         return True
 
     def _index(self, note: MemoryNote) -> None:

@@ -29,6 +29,7 @@ run *ARGS="--system amem --params default --dataset comparison --testset compari
 #   just compare conversation conversation
 compare DATASET="comparison" TESTSET="comparison":
     uv run lmb run --system amem      --params default           --dataset {{DATASET}} --testset {{TESTSET}}
+    uv run lmb run --system amem_lc   --params amem_lc-default    --dataset {{DATASET}} --testset {{TESTSET}}
     uv run lmb run --system hipporag  --params hipporag-default  --dataset {{DATASET}} --testset {{TESTSET}}
     uv run lmb run --system hipporag2 --params hipporag2-default --dataset {{DATASET}} --testset {{TESTSET}}
     @echo "Comparison index: results/{{DATASET}}_{{TESTSET}}/index.html"
