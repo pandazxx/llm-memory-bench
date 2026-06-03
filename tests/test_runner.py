@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from llm_memory_bench.core import experiment as exp_mod
-from llm_memory_bench.core.experiment import Experiment, run
+from llm_memory_bench.core.experiment import Experiment, rerender, run
 from llm_memory_bench.core.models import Query, QueryResult, Statement
 from llm_memory_bench.core.system import System
 
@@ -29,15 +29,23 @@ class StubSystem(System):
     def render_memory(self, out_dir: Path) -> None:
         (out_dir / "index.html").write_text("<html>mem</html>")
 
-    def render_retrieval(self, results, out_dir: Path) -> None:
-        (out_dir / "index.html").write_text("<html>res</html>")
+    def render_retrieval(self, results, out_dir: Path, scores=None) -> None:
+        (out_dir / "index.html").write_text(f"<html>res scores={scores is not None}</html>")
 
     def dump_memory_state(self, out_dir: Path) -> None:
         (out_dir / "state.json").write_text(json.dumps({"memories": {}}))
 
     @classmethod
     def render_from_state(cls, state_dir: Path, out_dir: Path) -> None:
-        (out_dir / "index.html").write_text("<html>rerender</html>")
+        (out_dir / "index.html").write_text("<html>rerender-mem</html>")
+
+    @classmethod
+    def render_retrieval_from_state(
+        cls, state_dir: Path, results, out_dir: Path, scores=None
+    ) -> None:
+        (out_dir / "index.html").write_text(
+            f"<html>rerender-res {len(results)} scores={len(scores or [])}</html>"
+        )
 
 
 def test_run_end_to_end(tmp_path, monkeypatch):
@@ -65,5 +73,16 @@ def test_run_end_to_end(tmp_path, monkeypatch):
     assert result_json["aggregate"]["macro_f1"] == 1.0
     assert result_json["aggregate"]["answer_accuracy"] == 1.0
     assert (run_dir / "memory" / "index.html").exists()
-    assert (run_dir / "result" / "index.html").exists()
+    # Scoring is threaded into the result viz.
+    assert "scores=True" in (run_dir / "result" / "index.html").read_text()
+    assert (results_root / "ds_ts" / "index.html").exists()
+
+    # Re-render from frozen json only (no LLM, no system construction).
+    (run_dir / "result" / "index.html").write_text("STALE")
+    (run_dir / "memory" / "index.html").write_text("STALE")
+    rerender("ds", "ts", results_root=results_root)
+    res_html = (run_dir / "result" / "index.html").read_text()
+    assert "rerender-res" in res_html
+    assert "scores=1" in res_html  # one query's score round-tripped through result.json
+    assert "rerender-mem" in (run_dir / "memory" / "index.html").read_text()
     assert (results_root / "ds_ts" / "index.html").exists()

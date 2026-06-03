@@ -11,6 +11,10 @@ help:
 sync:
     uv sync
 
+# List the datasets available under data/datasets (by name).
+datasets:
+    @ls -1 data/datasets | sed 's/\.yaml$//'
+
 # Run one experiment: System x param-set x dataset x test-set.
 # Writes results/<dataset>_<testset>/<system>_<paramset>/{memory,result}/.
 # Examples:
@@ -19,10 +23,26 @@ sync:
 run *ARGS="--system amem --params default --dataset comparison --testset comparison":
     uv run lmb run {{ARGS}}
 
-# Re-render memory + retrieval HTML from frozen state.json/result.json.
-# No LLM calls — use after editing the viz layer to iterate on visualisations.
-#   just render
-#   just render -- --dataset comparison --testset comparison
+# Run every registered system (each with its default param-set) against one
+# dataset/test-set, then build the shared comparison index.
+#   just compare
+#   just compare conversation conversation
+compare DATASET="comparison" TESTSET="comparison":
+    uv run lmb run --system amem      --params default           --dataset {{DATASET}} --testset {{TESTSET}}
+    uv run lmb run --system hipporag  --params hipporag-default  --dataset {{DATASET}} --testset {{TESTSET}}
+    uv run lmb run --system hipporag2 --params hipporag2-default --dataset {{DATASET}} --testset {{TESTSET}}
+    @echo "Comparison index: results/{{DATASET}}_{{TESTSET}}/index.html"
+
+# Re-render all memory + retrieval + comparison HTML for an experiment from
+# frozen state.json/result.json — no LLM calls. Use after editing the viz layer.
+#   just rerender
+#   just rerender conversation conversation
+rerender DATASET="comparison" TESTSET="comparison":
+    uv run lmb rerender --dataset {{DATASET}} --testset {{TESTSET}}
+
+# Low-level: re-render one system's memory HTML from a single frozen state.json.
+# For a whole experiment (memory + retrieval + comparison) use `just rerender`.
+#   just render -- --system hipporag --state-dir results/comparison_comparison/hipporag_default/memory
 render *ARGS:
     uv run lmb render {{ARGS}}
 

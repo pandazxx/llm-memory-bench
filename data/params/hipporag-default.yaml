@@ -1,0 +1,5 @@
+system: hipporag
+name: default
+params:
+  sim_threshold: 0.8
+  retrieval_k: 5

@@ -1,0 +1,7 @@
+system: hipporag2
+name: default
+params:
+  sim_threshold: 0.75
+  top_k_triples: 10
+  passage_seed_weight: 0.05
+  retrieval_k: 5

@@ -18,6 +18,7 @@ from ..io.testset import find_testset, load_testset
 from ..systems import get_system
 from ..viz.common import esc, page
 from . import scoring
+from .models import QueryResult
 from .storage import ensure_dirs, run_paths
 
 log = logging.getLogger(__name__)
@@ -55,7 +56,7 @@ def run(exp: Experiment, results_root: Path | str = "results") -> Path:
         results.append(result)
         scores.append(scoring.score_query(q, result))
 
-    system.render_retrieval(results, paths.result_dir)
+    system.render_retrieval(results, paths.result_dir, scores=[s.to_dict() for s in scores])
     agg = scoring.aggregate(scores)
 
     payload = {
@@ -79,6 +80,34 @@ def run(exp: Experiment, results_root: Path | str = "results") -> Path:
     return paths.run_dir
 
 
+def rerender(dataset: str, testset: str, results_root: Path | str = "results") -> Path:
+    """Re-emit every run's memory + retrieval HTML and the comparison index from
+    frozen state.json/result.json under ``results/<dataset>_<testset>/``. No LLM calls."""
+    experiment_dir = Path(results_root) / f"{dataset}_{testset}"
+    if not experiment_dir.is_dir():
+        raise FileNotFoundError(f"no results to re-render at {experiment_dir}")
+
+    n = 0
+    for result_json in sorted(experiment_dir.glob("*/result/result.json")):
+        run_dir = result_json.parent.parent
+        data = json.loads(result_json.read_text())
+        system_cls = get_system(data["experiment"]["system"])
+        memory_dir = run_dir / "memory"
+        result_dir = run_dir / "result"
+
+        system_cls.render_from_state(memory_dir, memory_dir)
+        results = [QueryResult.from_dict(d) for d in data.get("results", [])]
+        system_cls.render_retrieval_from_state(
+            memory_dir, results, result_dir, scores=data.get("scores", [])
+        )
+        n += 1
+        log.info("re-rendered %s", run_dir.name)
+
+    _write_comparison_index(experiment_dir)
+    log.info("re-rendered %d run(s) -> %s", n, experiment_dir)
+    return experiment_dir
+
+
 def _write_comparison_index(experiment_dir: Path) -> None:
     """Aggregate every <system>_<paramset>/result/result.json into a comparison table."""
     rows = []
@@ -86,10 +115,12 @@ def _write_comparison_index(experiment_dir: Path) -> None:
         data = json.loads(result_json.read_text())
         agg = data.get("aggregate", {})
         run_name = result_json.parent.parent.name
+        label = data.get("system_label", run_name)
         rows.append(
             "<tr>"
-            f"<td><a href='{esc(run_name)}/result/index.html'>{esc(run_name)}</a></td>"
-            f"<td><a href='{esc(run_name)}/memory/index.html'>memory</a></td>"
+            f"<td>{esc(label)}</td>"
+            f"<td><a href='{esc(run_name)}/result/index.html'>results</a> · "
+            f"<a href='{esc(run_name)}/memory/index.html'>memory</a></td>"
             f"<td>{agg.get('macro_precision', 0):.3f}</td>"
             f"<td>{agg.get('macro_recall', 0):.3f}</td>"
             f"<td>{agg.get('macro_f1', 0):.3f}</td>"
@@ -99,8 +130,9 @@ def _write_comparison_index(experiment_dir: Path) -> None:
         )
     body = (
         f"<h1>Comparison — {esc(experiment_dir.name)}</h1>"
+        f"<p class='muted'>{len(rows)} system(s) · macro-averaged over all queries</p>"
         "<table><thead><tr>"
-        "<th>System_paramset</th><th>Memory</th><th>Precision</th><th>Recall</th>"
+        "<th>System</th><th>Pages</th><th>Precision</th><th>Recall</th>"
         "<th>F1</th><th>Answer acc</th><th>N</th>"
         "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
     )

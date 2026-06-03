@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from ..core.system import System
 from .amem import AMem
+from .hipporag import HippoRAG
+from .hipporag2 import HippoRAG2
 
 REGISTRY: dict[str, type[System]] = {
     AMem.name: AMem,
+    HippoRAG.name: HippoRAG,
+    HippoRAG2.name: HippoRAG2,
 }
 
 
