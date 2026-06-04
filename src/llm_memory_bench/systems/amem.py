@@ -33,18 +33,14 @@ Generate a structured analysis of the following content by:
 2. Extracting core themes and contextual elements
 3. Creating relevant categorical tags
 
-Format the response as a JSON object:
-{{
-    "keywords": [
-        // several specific, distinct keywords; order most to least important
-    ],
-    "context":
-        // one sentence summarizing main topic, key points, and purpose
-    ,
-    "tags": [
-        // several broad categories/themes for classification
-    ]
-}}
+Respond with ONLY a valid JSON object — no comments, no markdown fences, no
+trailing commas — of exactly this shape:
+{{"keywords": ["keyword1", "keyword2"], "context": "one sentence", "tags": ["tag1", "tag2"]}}
+
+Where:
+- "keywords": several specific, distinct keywords, ordered most to least important.
+- "context": one sentence summarizing the main topic, key points, and purpose.
+- "tags": several broad categories or themes for classification.
 
 Content for analysis:
 {content}"""
