@@ -83,6 +83,7 @@ Model specific
 
 ## Startup model implementations
 - A-Mem
+- A-Mem (late chunking) — A-Mem with corpus-level late-chunked embeddings for neighbour search
 - HippoRAG
 - HippoRAG2
 

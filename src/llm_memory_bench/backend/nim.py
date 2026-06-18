@@ -52,6 +52,43 @@ def call(fn, *args, **kwargs):
             delay = min(delay * 2, BACKOFF_CAP)
 
 
+def _strip_json_comments(s: str) -> str:
+    """Drop ``//`` and ``/* */`` comments that aren't inside a JSON string.
+
+    LLMs frequently echo the comment placeholders from a schema example; this is
+    string-aware so it won't corrupt values like ``"https://..."``."""
+    out: list[str] = []
+    i, n = 0, len(s)
+    in_str = escape = False
+    while i < n:
+        c = s[i]
+        if in_str:
+            out.append(c)
+            if escape:
+                escape = False
+            elif c == "\\":
+                escape = True
+            elif c == '"':
+                in_str = False
+            i += 1
+        elif c == '"':
+            in_str = True
+            out.append(c)
+            i += 1
+        elif c == "/" and i + 1 < n and s[i + 1] == "/":
+            while i < n and s[i] != "\n":
+                i += 1
+        elif c == "/" and i + 1 < n and s[i + 1] == "*":
+            i += 2
+            while i + 1 < n and not (s[i] == "*" and s[i + 1] == "/"):
+                i += 1
+            i += 2
+        else:
+            out.append(c)
+            i += 1
+    return "".join(out)
+
+
 def parse_json(text: str) -> dict[str, Any]:
     """Extract the first {...} object from raw LLM output."""
     text = text.strip()
@@ -59,9 +96,16 @@ def parse_json(text: str) -> dict[str, Any]:
         text = re.sub(r"^```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
     match = re.search(r"\{[\s\S]*\}", text)
-    if match:
-        return json.loads(match.group())
-    raise ValueError(f"no JSON object found in LLM response:\n{text[:200]}")
+    if not match:
+        raise ValueError(f"no JSON object found in LLM response:\n{text[:200]}")
+    blob = match.group()
+    try:
+        return json.loads(blob)
+    except json.JSONDecodeError:
+        cleaned = _strip_json_comments(blob)
+        # Comment removal can leave a trailing comma before a } or ]; drop those.
+        cleaned = re.sub(r",(\s*[}\]])", r"\1", cleaned)
+        return json.loads(cleaned)
 
 
 def chat(
